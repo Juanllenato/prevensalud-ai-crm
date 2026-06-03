@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PrevenSalud CRM+ — Production AI Business Platform · Case Study</title>
+  <meta name="description" content="A production, AI-powered multi-tenant CRM by Juan Sebastian Perez: retrieval-augmented assistant, OCR-over-WhatsApp invoice capture, and automated LLM-written PDF reporting. Built on FastAPI, PostgreSQL RLS, Redis/Celery, DeepSeek & Claude." />
+  <meta name="author" content="Juan Sebastian Perez" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;850&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+  <!-- ====================== NAV ====================== -->
+  <nav class="nav">
+    <div class="wrap nav-inner">
+      <a class="brand" href="#hero">
+        <span class="logo">P+</span>
+        <span>PrevenSalud CRM+<small>Applied AI Engineering · Case Study</small></span>
+      </a>
+      <div class="nav-links">
+        <a href="#features">AI Features</a>
+        <a href="#assistant">Assistant</a>
+        <a href="#architecture">Architecture</a>
+        <a href="#security">Security</a>
+        <a href="#stack">Stack</a>
+        <a href="#design">System Design</a>
+        <a href="#contact" class="nav-cta">Contact</a>
+      </div>
+      <button class="nav-toggle" aria-label="Toggle navigation">☰</button>
+    </div>
+  </nav>
+
+  <!-- ====================== 1. HERO ====================== -->
+  <header class="hero" id="hero">
+    <div class="wrap">
+      <div class="badge"><span class="dot"></span> Live in production · crm.prevensalud.pe</div>
+      <h1>Production <span class="gradient-text">AI business platform</span><br />for a multi-branch sales operation</h1>
+      <p class="lead">
+        A multi-tenant FastAPI CRM with a <b>retrieval-augmented AI assistant</b>, an
+        <b>OCR-over-WhatsApp</b> invoice pipeline, and <b>automated LLM-written PDF reporting</b> —
+        hardened with Row-Level Security, RBAC, rate limiting and prompt-injection defenses.
+      </p>
+      <div class="hero-cta">
+        <a class="btn btn-primary" href="#features">Explore the AI systems →</a>
+        <a class="btn btn-ghost" href="#design">View system design</a>
+      </div>
+
+      <div class="hero-stats">
+        <div class="stat reveal"><div class="num gradient-text">~33</div><div class="lbl">API routers</div></div>
+        <div class="stat reveal"><div class="num gradient-text">~30</div><div class="lbl">Data models (multi-tenant)</div></div>
+        <div class="stat reveal"><div class="num gradient-text">3-layer</div><div class="lbl">Tenant isolation</div></div>
+        <div class="stat reveal"><div class="num gradient-text">0</div><div class="lbl">PII sent to the LLM</div></div>
+      </div>
+    </div>
+  </header>
+
+  <!-- ====================== 2. PROJECT OVERVIEW ====================== -->
+  <section id="overview">
+    <div class="wrap">
+      <span class="section-tag reveal">◆ Project Overview</span>
+      <h2 class="section-title reveal">AI woven into real operations — not a separate "AI tab"</h2>
+      <p class="section-sub reveal">
+        PrevenSalud sells preventive-health treatments across multiple branches through in-person
+        advisors, street canvassers and telemarketing. The platform replaces spreadsheets, WhatsApp
+        groups and manual commission math with a secure, AI-powered system of record.
+      </p>
+      <div class="grid grid-3">
+        <div class="card reveal"><div class="ic">🧠</div><h3>Contextual AI assistant</h3>
+          <p>Ask the business questions in natural language. Answers are grounded in live, access-controlled data — with zero customer PII reaching the model.</p></div>
+        <div class="card reveal"><div class="ic">🧾</div><h3>OCR invoice capture</h3>
+          <p>Photograph an invoice on WhatsApp → a structured, one-tap-approve expense. Cost-first multi-engine OCR.</p></div>
+        <div class="card reveal"><div class="ic">📊</div><h3>Automated reporting</h3>
+          <p>An LLM writes a CFO-grade executive PDF every night — with a deterministic fallback so it never fails.</p></div>
+        <div class="card reveal"><div class="ic">🏢</div><h3>Multi-tenant by branch</h3>
+          <p>PostgreSQL Row-Level Security + app filtering + a request-scoped branch selector. Defense in depth.</p></div>
+        <div class="card reveal"><div class="ic">⚙️</div><h3>Operational automation</h3>
+          <p>Celery Beat drives nightly reports, a morning collections sweep, and a 5-minute materialized-view refresh.</p></div>
+        <div class="card reveal"><div class="ic">💰</div><h3>Tested commission engine</h3>
+          <p><code>Decimal</code>-precise, fortnight-based, group-target-gated — backed by an 800-line unit test suite.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ====================== 3. BUSINESS PROBLEM ====================== -->
+  <section id="problem">
+    <div class="wrap">
+      <span class="section-tag reveal">◆ The Business Problem</span>
+      <h2 class="section-title reveal">Operational data trapped in unstructured channels</h2>
+      <p class="section-sub reveal">The data existed — it was just stuck in Excel, paper and WhatsApp. The job: capture it at the source, structure it, control who sees it, and make it answerable.</p>
+      <div class="grid grid-2">
+        <div class="card reveal"><h3>Before</h3>
+          <ul class="feature-list">
+            <li><span class="chk">×</span><span>Sales manifest in Excel/paper — no real-time view</span></li>
+            <li><span class="chk">×</span><span>Invoices shared in WhatsApp groups — expenses lost</span></li>
+            <li><span class="chk">×</span><span>Commissions computed by hand — hours + disputes</span></li>
+            <li><span class="chk">×</span><span>Partner reports typed manually — late and inconsistent</span></li>
+            <li><span class="chk">×</span><span>No accounts-receivable control — cash slipping</span></li>
+          </ul></div>
+        <div class="card reveal"><h3>After</h3>
+          <ul class="feature-list">
+            <li><span class="chk">✓</span><span><b>Real-time digital manifest</b> backed by a materialized view</span></li>
+            <li><span class="chk">✓</span><span><b>OCR over WhatsApp</b> captures expenses at the source</span></li>
+            <li><span class="chk">✓</span><span><b>Automated commission engine</b> (Decimal-precise, tested)</span></li>
+            <li><span class="chk">✓</span><span><b>Nightly AI-written PDF reports</b> delivered automatically</span></li>
+            <li><span class="chk">✓</span><span><b>Collections module + automated overdue sweep</b></span></li>
+          </ul></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ====================== 4. AI-POWERED FEATURES ====================== -->
+  <section id="features">
+    <div class="wrap">
+      <span class="section-tag reveal">◆ AI-Powered Features</span>
+      <h2 class="section-title reveal">Four AI/automation subsystems, each replacing a manual job</h2>
+      <p class="section-sub reveal">The interesting engineering isn't "we called an LLM" — it's making AI grounded, access-aware, cost-bounded and resilient inside a real operation.</p>
+      <div class="grid grid-2">
+        <div class="card reveal"><div class="ic">🧠</div><h3>Retrieval-augmented assistant</h3>
+          <p>Keyword-routed module retrieval queries only the relevant tables, sends aggregated metrics (no PII), enforces a per-user access policy, and defends against prompt injection.</p>
+          <div class="tag-row"><span class="pill">DeepSeek-V3</span><span class="pill">Together AI</span><span class="pill">RAG</span></div></div>
+        <div class="card reveal"><div class="ic">🧾</div><h3>OCR over WhatsApp</h3>
+          <p>Twilio webhook (HMAC-verified) → async Celery → Tesseract / Google Vision / Claude Haiku → approvable expense with inline corrections.</p>
+          <div class="tag-row"><span class="pill">Tesseract</span><span class="pill">Claude Haiku</span><span class="pill">Twilio</span></div></div>
+        <div class="card reveal"><div class="ic">📊</div><h3>Executive PDF reporting</h3>
+          <p>Concurrent metric aggregation + period deltas → LLM narrative (deterministic fallback) → ReportLab render in a threadpool → WhatsApp delivery.</p>
+          <div class="tag-row"><span class="pill">ReportLab</span><span class="pill">Celery Beat</span><span class="pill">LLM</span></div></div>
+        <div class="card reveal"><div class="ic">⚙️</div><h3>Operational automation</h3>
+          <p>Morning collections sweep (overdue → VENCIDO + reminders) and a 5-minute materialized-view refresh keep the business current.</p>
+          <div class="tag-row"><span class="pill">Celery</span><span class="pill">Redis</span><span class="pill">RLS</span></div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ====================== 5. CONTEXTUAL AI ASSISTANT ====================== -->
+  <section id="assistant">
+    <div class="wrap">
+      <span class="section-tag reveal">◆ Contextual AI Assistant</span>
+      <h2 class="section-title reveal">RAG over operational data — grounded, bounded, PII-free</h2>
+      <div class="split">
+        <div class="reveal">
+          <ul class="feature-list">
+            <li><span class="chk">→</span><span><b>Intent → modules.</b> A keyword router maps each question to only the relevant data modules; a "sales" question never touches seven other tables.</span></li>
+            <li><span class="chk">→</span><span><b>One query per module.</b> SQL <code>FILTER</code> aggregates return today + month-to-date in a single round-trip.</span></li>
+            <li><span class="chk">→</span><span><b>Aggregates, never rows.</b> The LLM receives counts, sums, group-bys and a staff roster with month-over-month trend — never a name, phone, DNI or medical record.</span></li>
+            <li><span class="chk">→</span><span><b>Per-user policy.</b> <code>ConfiguracionAI</code> gates by access level, enabled modules and sensitive flags (collections, payroll).</span></li>
+            <li><span class="chk">→</span><span><b>Tenant-scoped.</b> Always filtered to the user's branch(es).</span></li>
+          </ul>
+        </div>
+        <div class="panel reveal">
+          <div class="panel-head"><span class="d r"></span><span class="d y"></span><span class="d g"></span><span class="t">asistente.py · _build_context</span></div>
+<pre class="code"><span class="c"># Intent → only the modules this question needs</span>
+mods = <span class="f">_modulos_relevantes</span>(pregunta, habilitados)
+
+<span class="c"># One combined aggregate query per module (no PII)</span>
+<span class="k">select</span>(
+  func.count().<span class="f">filter</span>(Venta.fecha == hoy),
+  func.sum(Venta.monto).<span class="f">filter</span>(Venta.fecha &gt;= mes),
+).where(Venta.sucursal_id.<span class="f">in_</span>(visibles))
+
+<span class="c"># Sent to the model: aggregates + staff roster only</span>
+ctx[<span class="s">"equipo_asesores"</span>] = {
+  <span class="s">"resumen_por_sucursal"</span>: [...],   <span class="c"># incl. empty branches</span>
+  <span class="s">"asesores"</span>: [{ nombre, sucursal, tendencia }],
+}</pre>
+        </div>
+      </div>
+      <div class="grid grid-3" style="margin-top:32px">
+        <div class="li-card reveal"><div class="ic2">🛡️</div><div><b>3-layer injection defense</b><span>Control-token stripping → cheap jailbreak heuristic (blocks before token spend) → XML-delimited input treated as data.</span></div></div>
+        <div class="li-card reveal"><div class="ic2">⏱️</div><div><b>Bounded cost & latency</b><span>~5–15 KB context, capped output tokens, 45s timeout, and a 20/min · 300/day rate limit.</span></div></div>
+        <div class="li-card reveal"><div class="ic2">🎯</div><div><b>Honest answers</b><span>The prompt distinguishes "no records" from "no access" and forbids invented numbers.</span></div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ====================== 6. OCR INVOICE PROCESSING ====================== -->
+  <section id="ocr">
+    <div class="wrap">
+      <span class="section-tag reveal">◆ OCR Invoice Processing</span>
+      <h2 class="section-title reveal">Snap a photo on WhatsApp → an approvable expense</h2>
+      <p class="section-sub reveal">Capturing data where it happens, with a human in the loop and a cost-first engine strategy.</p>
+      <div class="steps reveal">
+        <div class="step"><div><h4>Webhook + verification</h4><p>Twilio HMAC-SHA1 signature verified (fail-closed); sender matched to a user; role checked (ADMIN/HOSTESS).</p></div></div>
+        <div class="step"><div><h4>Instant response, async work</h4><p>The webhook returns TwiML 200 immediately and enqueues a Celery task — OCR latency never blocks the reply.</p></div></div>
+        <div class="step"><div><h4>Cost-first multi-engine OCR</h4><p>Free local <b>Tesseract</b> by default → <b>Google Cloud Vision</b> / <b>Claude Haiku Vision</b> opt-in for hard images. Pillow pre-processing boosts accuracy.</p></div></div>
+        <div class="step"><div><h4>Extract + persist</h4><p>Amount, date, vendor, reference (regex fallbacks) → validated → <code>Egreso</code> in <b>PENDIENTE_CONFIRMACION</b> with raw OCR JSON kept for audit.</p></div></div>
+        <div class="step"><div><h4>Human-in-the-loop confirmation</h4><p>Reply <code>SI</code> to approve, <code>NO</code> to reject, or <code>CORREGIR monto=125000</code> to fix a whitelisted field — no re-upload.</p></div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ====================== 7. PDF REPORT GENERATION ====================== -->
+  <section id="reporting">
+    <div class="wrap">
+      <span class="section-tag reveal">◆ PDF Report Generation</span>
+      <h2 class="section-title reveal">A CFO-grade report, written and delivered automatically</h2>
+      <div class="split">
+        <div class="panel reveal">
+          <div class="panel-head"><span class="d r"></span><span class="d y"></span><span class="d g"></span><span class="t">reporte_pdf.py · build pipeline</span></div>
+<pre class="code"><span class="c"># Concurrent metric collection + previous period for deltas</span>
+datos = <span class="k">await</span> <span class="f">recolectar_datos</span>(db, periodo, fecha, sucursal)
+
+<span class="c"># LLM narrative — with deterministic fallback</span>
+<span class="k">try</span>:
+    resumen = <span class="k">await</span> llm.<span class="f">generate_reporte_diario</span>(datos)
+<span class="k">except</span> Exception:
+    resumen = <span class="f">_reporte_fallback</span>(datos)   <span class="c"># never fails</span>
+
+<span class="c"># CPU-bound render OFF the event loop</span>
+pdf = <span class="k">await</span> <span class="f">run_in_threadpool</span>(construir_pdf, datos, resumen)</pre>
+        </div>
+        <div class="reveal">
+          <ul class="feature-list">
+            <li><span class="chk">→</span><span><b>KPI cards with period-over-period deltas</b> (income, expenses, net result)</span></li>
+            <li><span class="chk">→</span><span><b>Operational funnel:</b> entered → attended → bought, conversion, average ticket</span></li>
+            <li><span class="chk">→</span><span><b>Charts:</b> payment methods, result, daily series</span></li>
+            <li><span class="chk">→</span><span><b>Per-advisor efficiency table</b> + commissions by role</span></li>
+            <li><span class="chk">→</span><span><b>Role-gated &amp; rate-limited</b> in-app download (8/min · 40/hour), branch-scoped</span></li>
+            <li><span class="chk">→</span><span><b>Nightly delivery</b> to partners via Celery Beat + WhatsApp</span></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ====================== 8. BACKEND ARCHITECTURE ====================== -->
+  <section id="architecture">
+    <div class="wrap">
+      <span class="section-tag reveal">◆ Backend Architecture</span>
+      <h2 class="section-title reveal">A modular monolith with strict layer boundaries</h2>
+      <p class="section-sub reveal">Thin routers, pure-logic services, an isolated integrations layer, and a tenant-aware data core — the boundaries that keep the commission engine testable and the integrations mockable.</p>
+      <div class="grid grid-4">
+        <div class="card reveal"><div class="ic">🌐</div><h3>api/v1</h3><p>~33 routers: validation (Pydantic), authz (require_roles), orchestration.</p></div>
+        <div class="card reveal"><div class="ic">🧩</div><h3>services</h3><p>Pure business logic — commission engine, manifest, PDF builder. No HTTP concerns.</p></div>
+        <div class="card reveal"><div class="ic">🔌</div><h3>integrations</h3><p>The only place external APIs are called: LLM, OCR/Vision, WhatsApp — with timeouts &amp; retries.</p></div>
+        <div class="card reveal"><div class="ic">🧱</div><h3>core</h3><p>Security (JWT/RBAC/Fernet), database (RLS context), config (fail-fast), cache.</p></div>
+      </div>
+      <div class="diagram reveal" style="margin-top:28px">
+        <div class="cap">Request lifecycle — cross-cutting concerns</div>
+        <div class="mermaid">
+flowchart LR
+    A["nginx (TLS)"] --> B["rate limit"]
+    B --> C["security headers"]
+    C --> D["audit log (SHA-256 body hash)"]
+    D --> E["CORS"]
+    E --> F["JWT decode + RBAC"]
+    F --> G["RLS tenant context"]
+    G --> H["router to service to ORM"]
+    H --> I[("PostgreSQL (RLS)")]
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ====================== 9. AI WORKFLOWS ====================== -->
+  <section id="workflows">
+    <div class="wrap">
+      <span class="section-tag reveal">◆ AI Workflows</span>
+      <h2 class="section-title reveal">How the AI subsystems improve business efficiency</h2>
+      <div class="grid grid-2">
+        <div class="card reveal"><h3>Manual job → automated by</h3>
+          <ul class="feature-list">
+            <li><span class="chk">→</span><span>Compiling numbers &amp; answering owners → <b>AI assistant</b></span></li>
+            <li><span class="chk">→</span><span>Typing invoices into a ledger → <b>OCR over WhatsApp</b></span></li>
+            <li><span class="chk">→</span><span>Writing the nightly partner report → <b>PDF engine</b></span></li>
+            <li><span class="chk">→</span><span>Chasing overdue installments → <b>collections sweep</b></span></li>
+            <li><span class="chk">→</span><span>Reconciling the daily manifest → <b>materialized view</b></span></li>
+          </ul></div>
+        <div class="card reveal"><h3>Why it's resilient</h3>
+          <ul class="feature-list">
+            <li><span class="chk">✓</span><span>Provider-agnostic <code>LLMService</code> (timeout + bounded tokens + 1 retry)</span></li>
+            <li><span class="chk">✓</span><span>Deterministic report fallback if the model is down</span></li>
+            <li><span class="chk">✓</span><span>Cost-first OCR: most invoices cost $0 to read</span></li>
+            <li><span class="chk">✓</span><span>Fire-and-forget webhooks → Celery (no blocking)</span></li>
+            <li><span class="chk">✓</span><span>Every external dependency degrades gracefully</span></li>
+          </ul></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ====================== 10. SECURITY & RELIABILITY ====================== -->
+  <section id="security">
+    <div class="wrap">
+      <span class="section-tag reveal">◆ Security &amp; Reliability</span>
+      <h2 class="section-title reveal">Hardened for multi-tenant production</h2>
+      <div class="grid grid-3">
+        <div class="li-card reveal"><div class="ic2">🏢</div><div><b>3-layer tenant isolation</b><span>PostgreSQL RLS + app filtering + request-scoped X-Sucursal-Id. A leak needs three failures.</span></div></div>
+        <div class="li-card reveal"><div class="ic2">🔑</div><div><b>JWT RS256 + 9-role RBAC</b><span>Fixed algorithm, password_changed_at invalidation, anti-privilege-escalation.</span></div></div>
+        <div class="li-card reveal"><div class="ic2">🔐</div><div><b>PII encryption at rest</b><span>Fernet for DNI &amp; medical data; the AI context is structurally PII-free.</span></div></div>
+        <div class="li-card reveal"><div class="ic2">🛡️</div><div><b>Prompt-injection defense</b><span>Control-token stripping, jailbreak heuristics, delimited input.</span></div></div>
+        <div class="li-card reveal"><div class="ic2">🚦</div><div><b>Rate limiting</b><span>slowapi + Redis on login, AI chat, OCR, and PDF endpoints.</span></div></div>
+        <div class="li-card reveal"><div class="ic2">📝</div><div><b>Audit logging</b><span>Non-blocking middleware: endpoint, method, IP, status, SHA-256 body hash.</span></div></div>
+        <div class="li-card reveal"><div class="ic2">📡</div><div><b>Verified webhooks</b><span>Twilio HMAC-SHA1 signature verification (fail-closed).</span></div></div>
+        <div class="li-card reveal"><div class="ic2">🧰</div><div><b>Security headers</b><span>HSTS, CSP, X-Frame-Options DENY, nosniff, Referrer-Policy.</span></div></div>
+        <div class="li-card reveal"><div class="ic2">♻️</div><div><b>Graceful degradation</b><span>Redis, LLM, OCR, WhatsApp all fail soft — the core flow never crashes.</span></div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ====================== 11. SCALABILITY ====================== -->
+  <section id="scalability">
+    <div class="wrap">
+      <span class="section-tag reveal">◆ Scalability Considerations</span>
+      <h2 class="section-title reveal">Don't do expensive things on the hot path</h2>
+      <div class="grid grid-3">
+        <div class="card reveal"><div class="ic">⚡</div><h3>Async everywhere</h3><p>FastAPI + SQLAlchemy async + asyncpg for I/O-bound throughput; stateless JWT for horizontal scale.</p></div>
+        <div class="card reveal"><div class="ic">🎯</div><h3>Targeted retrieval</h3><p>1–3 aggregate queries per AI question instead of full scans.</p></div>
+        <div class="card reveal"><div class="ic">🗂️</div><h3>Materialized view</h3><p>mv_manifiesto_diario (5-min refresh) serves the hottest reads in sub-500 ms.</p></div>
+        <div class="card reveal"><div class="ic">🧵</div><h3>Offload CPU work</h3><p>PDF render in a threadpool; OCR in Celery workers that scale independently of the API.</p></div>
+        <div class="card reveal"><div class="ic">🧮</div><h3>Composite indexes</h3><p>(sucursal_id, fecha_venta), (sucursal_id, estado) on the hottest query paths.</p></div>
+        <div class="card reveal"><div class="ic">🌎</div><h3>Distributed limits</h3><p>Redis-backed rate limiting holds across horizontally-scaled API instances.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ====================== 12. TECHNICAL STACK ====================== -->
+  <section id="stack">
+    <div class="wrap">
+      <span class="section-tag reveal">◆ Technical Stack</span>
+      <h2 class="section-title reveal">Verified, production technology</h2>
+      <div class="grid grid-2">
+        <div class="stack-group reveal"><h4>Backend</h4><div class="kv">
+          <span class="pill">Python 3.12</span><span class="pill">FastAPI (async)</span><span class="pill">SQLAlchemy 2.0</span>
+          <span class="pill">Pydantic v2</span><span class="pill">asyncpg</span><span class="pill">Alembic</span></div></div>
+        <div class="stack-group reveal"><h4>AI / ML</h4><div class="kv">
+          <span class="pill">DeepSeek-V3</span><span class="pill">Together AI</span><span class="pill">Claude Haiku</span>
+          <span class="pill">Tesseract</span><span class="pill">Google Vision</span><span class="pill">Pillow</span></div></div>
+        <div class="stack-group reveal"><h4>Data &amp; Infra</h4><div class="kv">
+          <span class="pill">PostgreSQL (RLS)</span><span class="pill">Redis 7</span><span class="pill">Celery 5.3</span>
+          <span class="pill">Docker Compose</span><span class="pill">nginx</span><span class="pill">Hetzner</span><span class="pill">Sentry</span></div></div>
+        <div class="stack-group reveal"><h4>Security</h4><div class="kv">
+          <span class="pill">JWT RS256</span><span class="pill">bcrypt</span><span class="pill">Fernet (PII)</span>
+          <span class="pill">slowapi</span><span class="pill">HMAC webhooks</span></div></div>
+        <div class="stack-group reveal"><h4>Frontend</h4><div class="kv">
+          <span class="pill">Next.js 14</span><span class="pill">React 18</span><span class="pill">TanStack Query</span>
+          <span class="pill">Axios</span><span class="pill">Tailwind</span><span class="pill">ShadCN</span></div></div>
+        <div class="stack-group reveal"><h4>Messaging &amp; Reporting</h4><div class="kv">
+          <span class="pill">Twilio WhatsApp</span><span class="pill">ReportLab 4</span><span class="pill">Celery Beat</span></div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ====================== 13. SYSTEM DESIGN ====================== -->
+  <section id="design">
+    <div class="wrap">
+      <span class="section-tag reveal">◆ System Design</span>
+      <h2 class="section-title reveal">Component &amp; flow diagrams</h2>
+      <p class="section-sub reveal">Every diagram reflects the actual implementation. Full set in <code>system-design/SYSTEM_DESIGN.md</code>.</p>
+
+      <div class="diagram reveal">
+        <div class="cap">Container / component diagram</div>
+        <div class="mermaid">
+flowchart TB
+    B["Browser (Next.js 14)"] -->|HTTPS| N["nginx"]
+    WA["WhatsApp"] -->|"Webhook (HMAC)"| API
+    N --> API["FastAPI async — ~33 routers"]
+    API --> SVC["Services & Integrations"]
+    SVC --> LLM["LLMService → DeepSeek-V3"]
+    SVC --> OCR["OCR → Tesseract / Vision / Claude"]
+    SVC --> TW["Twilio WhatsApp"]
+    SVC --> PG[("PostgreSQL — RLS")]
+    SVC --> RD[("Redis")]
+    BEAT["Celery + Beat"] --> PG
+    BEAT --> RD
+    BEAT --> EXT["Together AI · Anthropic · Google · Twilio"]
+        </div>
+      </div>
+
+      <div class="diagram reveal">
+        <div class="cap">AI assistant — contextual retrieval</div>
+        <div class="mermaid">
+flowchart TD
+    Q["Question"] --> S["Sanitize + jailbreak heuristic"]
+    S --> R["Keyword router → relevant modules only"]
+    R --> P["Access policy: level + module + tenant"]
+    P --> A["Per-module FILTER-aggregate query (NO PII)"]
+    A --> M["Prompt: rules + history + delimited input"]
+    M --> L["DeepSeek-V3 (45s timeout, bounded tokens)"]
+    L --> O["Persist + respond {respuesta, contexto_usado}"]
+        </div>
+      </div>
+
+      <div class="diagram reveal">
+        <div class="cap">OCR over WhatsApp — sequence</div>
+        <div class="mermaid">
+sequenceDiagram
+    participant U as Admin (WhatsApp)
+    participant W as Webhook
+    participant C as Celery worker
+    participant DB as PostgreSQL
+    U->>W: Send invoice photo
+    W->>W: Verify HMAC + role
+    W-->>U: 200 (immediate)
+    W->>C: enqueue procesar_factura
+    C->>C: OCR (Tesseract → Vision → Claude)
+    C->>DB: Egreso (PENDIENTE_CONFIRMACION)
+    C-->>U: Summary + SI / NO / CORREGIR
+    U->>W: "SI"  →  CONFIRMADO
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ====================== 14. PRODUCTION DEPLOYMENT ====================== -->
+  <section id="deployment">
+    <div class="wrap">
+      <span class="section-tag reveal">◆ Production Deployment</span>
+      <h2 class="section-title reveal">Containerized, scripted, observable</h2>
+      <div class="grid grid-3">
+        <div class="card reveal"><div class="ic">🐳</div><h3>Docker Compose</h3><p>api · frontend · redis · celery_worker · celery_beat — one reproducible topology.</p></div>
+        <div class="card reveal"><div class="ic">🔒</div><h3>nginx + private API</h3><p>TLS termination; API bound to 127.0.0.1 with uvicorn --proxy-headers.</p></div>
+        <div class="card reveal"><div class="ic">🗄️</div><h3>Managed PostgreSQL</h3><p>Accessed via the pooler with NullPool; PG 17 in production.</p></div>
+        <div class="card reveal"><div class="ic">🚀</div><h3>Scripted deploys</h3><p>git pull → build → alembic upgrade → restart, with --skip-migrations / --quick flags.</p></div>
+        <div class="card reveal"><div class="ic">💾</div><h3>Backups</h3><p>Scheduled pg_dump (custom format); a full backup precedes any destructive op.</p></div>
+        <div class="card reveal"><div class="ic">📈</div><h3>Observability</h3><p>Sentry error tracking with environment-scoped sampling.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ====================== 15. ENGINEERING CHALLENGES ====================== -->
+  <section id="challenges">
+    <div class="wrap">
+      <span class="section-tag reveal">◆ Key Engineering Challenges</span>
+      <h2 class="section-title reveal">Real bugs, real fixes</h2>
+      <div class="grid grid-2">
+        <div class="challenge reveal"><h4>Rate limits that silently didn't fire</h4><p>Two stacked <code>@limiter.limit</code> decorators don't compose. <span class="fix">Fix:</span> single-decorator <code>"8/minute;40/hour"</code> syntax, verified with parallel request bursts.</p></div>
+        <div class="challenge reveal"><h4>FastAPI route shadowing</h4><p>A dynamic <code>/{id}</code> route captured <code>/citas/disponibilidad</code> and parsed the literal as a UUID (422). <span class="fix">Fix:</span> order specific routes before parameterized ones.</p></div>
+        <div class="challenge reveal"><h4>Hard-reload logout race</h4><p>A child layout's auth guard ran before the provider rehydrated from localStorage. <span class="fix">Fix:</span> gate on <code>!isLoading &amp;&amp; !isAuthenticated</code>.</p></div>
+        <div class="challenge reveal"><h4>Keeping the model honest</h4><p>The assistant said "no data" when the truth was "zero advisors in that branch." <span class="fix">Fix:</span> add a per-branch summary (incl. empty branches) + rewrite the prompt to separate "no records" from "no access."</p></div>
+        <div class="challenge reveal"><h4>pgBouncer + migrations</h4><p>The pooler rejects <code>CREATE INDEX CONCURRENTLY</code>. <span class="fix">Fix:</span> plain <code>CREATE INDEX IF NOT EXISTS</code> + NullPool.</p></div>
+        <div class="challenge reveal"><h4>Tenant-switch session drop</h4><p>Switching branches logged users out. <span class="fix">Fix:</span> add X-Sucursal-Id to CORS allow_headers + resolve the hydration race.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ====================== 16. FUTURE IMPROVEMENTS ====================== -->
+  <section id="future">
+    <div class="wrap">
+      <span class="section-tag reveal">◆ Future Improvements</span>
+      <h2 class="section-title reveal">Honest roadmap (tracked, not hidden)</h2>
+      <div class="grid grid-2">
+        <div class="card reveal"><h3>Security</h3>
+          <div class="future-item"><span class="arr">↗</span><span>MFA/TOTP for high-privilege roles + a token-revocation list</span></div>
+          <div class="future-item"><span class="arr">↗</span><span>CI security gates (bandit, pip-audit, tsc --noEmit)</span></div>
+          <div class="future-item"><span class="arr">↗</span><span>Restrict audit-log read access by role</span></div></div>
+        <div class="card reveal"><h3>Platform</h3>
+          <div class="future-item"><span class="arr">↗</span><span>Consolidate the thin service layer (VentaService / CarteraService)</span></div>
+          <div class="future-item"><span class="arr">↗</span><span>Token-usage metering + per-tenant LLM cost dashboards</span></div>
+          <div class="future-item"><span class="arr">↗</span><span>Retention/archival for audit_logs &amp; AI conversations</span></div>
+          <div class="future-item"><span class="arr">↗</span><span>Circuit breakers around Twilio / Vision / LLM + Sentry-Celery</span></div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ====================== 17. PORTFOLIO / CONTACT ====================== -->
+  <section id="contact">
+    <div class="wrap">
+      <div class="contact-card reveal">
+        <span class="eyebrow">APPLIED AI · BACKEND · GENAI ENGINEERING</span>
+        <h2 style="margin-top:14px">Production AI, grounded in real business value</h2>
+        <p>PrevenSalud CRM+ is a live system where AI does real operational work — safely, cheaply, and reliably. If you're hiring for AI / Applied AI / AI Systems / Backend AI / GenAI Engineering, this is the kind of system I build and ship.</p>
+        <div class="hero-cta" style="margin-bottom:26px">
+          <a class="btn btn-primary" href="https://crm.prevensalud.pe" target="_blank" rel="noopener">View live system →</a>
+          <a class="btn btn-ghost" href="../case-study/CASE_STUDY.md">Read the case study</a>
+        </div>
+        <div class="author">
+          <div class="author-name">Juan Sebastian Perez</div>
+          <div class="author-role">AI / Backend Engineer</div>
+          <div class="author-links">
+            <a href="mailto:juans.perezc@gmail.com">✉ juans.perezc@gmail.com</a>
+            <a href="https://www.linkedin.com/in/juan-perez-91b797251/" target="_blank" rel="noopener">in LinkedIn</a>
+            <a href="https://github.com/Juanllenato" target="_blank" rel="noopener">⌘ GitHub</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ====================== FOOTER ====================== -->
+  <footer class="footer">
+    <div class="wrap">
+      <span>PrevenSalud CRM+ · Applied AI Engineering Case Study · © Juan Sebastian Perez</span>
+      <span>Documentation only — no proprietary source or customer PII is reproduced.</span>
+    </div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+  <script src="assets/script.js"></script>
+</body>
+</html>
