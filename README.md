@@ -15,6 +15,15 @@ and interview panels.
 
 ---
 
+## 🎥 Demo
+
+https://github.com/Juanllenato/prevensalud-ai-crm/raw/main/media/crm-ai-demo.mp4
+
+> The AI features live: contextual assistant over business data, OCR invoice capture, and automated reporting.
+> ▶ [Download / watch the demo](./media/crm-ai-demo.mp4)
+
+---
+
 ## 30‑second pitch
 
 PrevenSalud CRM+ replaces spreadsheets, WhatsApp groups, and manual commission math
