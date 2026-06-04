@@ -1,5 +1,16 @@
 # PrevenSalud CRM+ — Applied AI Engineering Case Study
 
+<p>
+  <img src="https://img.shields.io/badge/Status-In%20Production-22C55E?style=flat-square" />
+  <img src="https://img.shields.io/badge/Python-3.12-3776AB?style=flat-square&logo=python&logoColor=white" />
+  <img src="https://img.shields.io/badge/FastAPI-async-009688?style=flat-square&logo=fastapi&logoColor=white" />
+  <img src="https://img.shields.io/badge/PostgreSQL-multi--tenant%20RLS-4169E1?style=flat-square&logo=postgresql&logoColor=white" />
+  <img src="https://img.shields.io/badge/LLM-RAG-6C2BD9?style=flat-square" />
+  <img src="https://img.shields.io/badge/OCR-Document%20AI-0EA5E9?style=flat-square" />
+  <img src="https://img.shields.io/badge/Celery-automation-37814A?style=flat-square&logo=celery&logoColor=white" />
+  <img src="https://img.shields.io/badge/Docker-deployed-2496ED?style=flat-square&logo=docker&logoColor=white" />
+</p>
+
 > A production, AI‑powered business platform for a multi‑branch preventive‑health
 > sales operation. **Live:** [crm.prevensalud.pe](https://crm.prevensalud.pe)
 
@@ -21,6 +32,33 @@ https://github.com/Juanllenato/prevensalud-ai-crm/raw/main/media/crm-ai-demo.mp4
 
 > The AI features live: contextual assistant over business data, OCR invoice capture, and automated reporting.
 > ▶ [Download / watch the demo](./media/crm-ai-demo.mp4)
+
+---
+
+## 🏗️ System architecture
+
+```mermaid
+flowchart LR
+  U["Staff / Partners"] -->|HTTPS| FE["Next.js 14 frontend"]
+  WA["WhatsApp (Twilio)"] -->|signed webhook| API
+  FE --> API["FastAPI async API · JWT/RBAC"]
+  API --> RLS{"Row-Level Security<br/>multi-tenant by branch"}
+  RLS --> PG[("PostgreSQL")]
+  API --> REDIS[("Redis · cache / rate-limit / queue")]
+  API --> LLM["LLM Assistant<br/>RAG · targeted retrieval · PII-free"]
+  LLM --> PG
+  API --> OCR["OCR pipeline<br/>Tesseract → Vision → Claude (cost-first)"]
+  subgraph Async["Celery workers + Beat"]
+    REPORTS["Automated PDF reports<br/>(LLM + deterministic fallback)"]
+    COBRANZA["Collections sweep"]
+    MV["Materialized view refresh"]
+  end
+  API -.enqueue.-> Async
+  Async --> PG
+  REPORTS --> WA
+```
+
+> **Defense in depth:** PostgreSQL RLS **+** application-level tenant filtering **+** request-scoped branch selector. A cross-tenant leak requires three independent failures.
 
 ---
 
